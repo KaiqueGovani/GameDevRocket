@@ -9,6 +9,7 @@ public class Spawn : MonoBehaviour
     public int numberOfSpawns;
 
     public float timeBetweenSpawnsEasy;
+    public float timeBetweenSpawnsMedium;
     public float timeBetweenSpawnsHard;
     float nextSpawnTime;
 
@@ -20,6 +21,7 @@ public class Spawn : MonoBehaviour
     public float timeBetweenEnvSpawns;
     float nextEnvSpawnTime;
 
+    public float timeUntilMediumDifficulty;
     public float timeUntilMaxDifficulty;
 
     public GameObject CoinPrefab;
@@ -69,19 +71,38 @@ public class Spawn : MonoBehaviour
                 spawnPoints.Add(spawnPointsStart[i]);
             }
 
-            nextSpawnTime = Time.time + Mathf.Lerp(timeBetweenSpawnsEasy, timeBetweenSpawnsHard, GetDifficultyPercent());
-            Time.timeScale = Mathf.Lerp(1, 2, GetDifficultyPercent());
+            updateDifficulty();
+
+            
         }    
     }
 
     float GetDifficultyPercent()
     {
-        return Mathf.Clamp01(Time.timeSinceLevelLoad / timeUntilMaxDifficulty);
+        return Mathf.Clamp01((Time.timeSinceLevelLoad - timeUntilMediumDifficulty) / timeUntilMaxDifficulty);
+    }
+
+    float GetMediumDifficultyPercent()
+    {
+        return Mathf.Clamp01(Time.timeSinceLevelLoad / timeUntilMediumDifficulty);
     }
 
     void SpawnCoin(Transform position)
     {
         GameObject parent = Instantiate(GenParent, position.position, position.rotation);
         GameObject child = Instantiate(CoinPrefab, parent.transform);
+    }
+
+    void updateDifficulty()
+    {
+        if (GetMediumDifficultyPercent() <= 1) //Se está na dificuldade média
+        {
+            nextSpawnTime = Time.time + Mathf.Lerp(timeBetweenSpawnsEasy, timeBetweenSpawnsHard, GetMediumDifficultyPercent());
+            Time.timeScale = Mathf.Lerp(1f, 1.4f, GetMediumDifficultyPercent());
+        }
+        else { //Dificuldade Difícil
+            nextSpawnTime = Time.time + Mathf.Lerp(timeBetweenSpawnsEasy, timeBetweenSpawnsHard, GetDifficultyPercent());
+            Time.timeScale = Mathf.Lerp(1.4f, 2f, GetDifficultyPercent());
+        }
     }
 }
