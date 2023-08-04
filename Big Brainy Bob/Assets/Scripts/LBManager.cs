@@ -32,7 +32,7 @@ public class LBManager : MonoBehaviour
                 entryField.text = "";
             }
             
-        for (int i = 0; i < entries.Length; i++)
+        for (int i = 0; i < _entradas.Length; i++)
             {
                 string username = entries[i].Username;
 
